@@ -1,0 +1,74 @@
+﻿@model TrabajadoresPrueba.Models.TrabajadorModel
+@{
+}
+
+<form id="formEditTrabajador" asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group row mb-2">
+        <label asp-for="TipoDocumento" class="col-sm-5 col-form-label">Tipo Documento</label>
+        <div class="col-sm-7">
+            <select asp-for="TipoDocumento" class="form-select">
+                <option value="">-- Seleccione --</option>
+                <option value="DNI" selected>DNI</option>
+            </select>
+        </div>
+        <span asp-validation-for="TipoDocumento" class="text-danger"></span>
+    </div>
+
+    <div class="form-group row mb-2">
+        <label asp-for="NumeroDocumento" class="col-sm-5 col-form-label">Número Documento</label>
+        <div class="col-sm-7">
+            <input asp-for="NumeroDocumento" class="form-control" />
+        </div>
+        <span asp-validation-for="NumeroDocumento" class="text-danger"></span>
+    </div>
+
+    <div class="form-group row mb-2">
+        <label asp-for="Nombres" class="col-sm-5 col-form-label"></label>
+        <div class="col-sm-7">
+            <input asp-for="Nombres" class="form-control col-sm-8" />
+        </div>
+        <span asp-validation-for="Nombres" class="text-danger"></span>
+    </div>
+
+    <div class="form-group row mb-2">
+        <label asp-for="Sexo" class="col-sm-5 col-form-label"></label>
+        <div class="col-sm-7 d-flex gap-3">
+            <div class="form-check">
+                <input asp-for="Sexo" class="form-check-input" type="radio" name="sexo" id="sexoMasculino" value="M">
+                <label class="form-check-label" for="sexoMasculino">Masculino</label>
+            </div>
+            <div class="form-check">
+                <input asp-for="Sexo" class="form-check-input" type="radio" name="sexo" id="sexoFemenino" value="F">
+                <label class="form-check-label" for="sexoFemenino">Femenino</label>
+            </div>
+        </div>
+        <span asp-validation-for="Sexo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group row mb-2">
+        <label asp-for="IdDepartamento" class="col-sm-5 col-form-label">Departamento</label>
+        <div class="col-sm-7">
+            <select asp-for="IdDepartamento" class="form-select" asp-items="ViewBag.departamentos"></select>
+        </div>
+        <span asp-validation-for="IdDepartamento" class="text-danger"></span>
+    </div>
+
+    <div class="form-group row mb-2">
+        <label asp-for="IdProvincia" class="col-sm-5 col-form-label">Provincia</label>
+        <div class="col-sm-7">
+            <select asp-for="IdProvincia" class="form-select" asp-items="ViewBag.provincias"></select>
+        </div>
+        <span asp-validation-for="IdProvincia" class="text-danger"></span>
+    </div>
+
+    <div class="form-group row mb-4">
+        <label asp-for="IdDistrito" class="col-sm-5 col-form-label">Distrito</label>
+        <div class="col-sm-7">
+            <select asp-for="IdDistrito" class="form-select" asp-items="ViewBag.distritos"></select>
+        </div>
+        <span asp-validation-for="IdDistrito" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn w-100 btn-success">Guardar</button>
+</form>
