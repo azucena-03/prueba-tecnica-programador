@@ -1,46 +1,47 @@
 ﻿@model IEnumerable<TrabajadoresPrueba.Repositories.TrabajadorVm>
 @{
+    var generos = new[]
+    {
+        new { Valor = "M", Nombre = "Masculino" },
+        new { Valor = "F", Nombre = "Femenino" }
+    };
 }
 
 <div class="tbl-container" style="font-size:.81rem;">
     <h2 class="text-center fw-bold fs-6 mb-5">Listado de Trabajadores</h2>
 
-    <button type="button" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#modalAddTrabajador">
-        Nuevo Registro
-    </button>
+    <div class="d-flex justify-content-between mb-4">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAddTrabajador">
+            Nuevo Registro
+        </button>
 
-    <table class="table table-bordered">
-        <tr>
-            <th>Tipo Documento</th>
-            <th>Número Documento</th>
-            <th>Nombres</th>
-            <th>Sexo</th>
-            <th>Departamento</th>
-            <th>Provincia</th>
-            <th>Distrito</th>
-            <th class="text-center">Acción</th>
-        </tr>
+        <select id="comboGenero" class="form-select w-25">
+            <option value="">-- Todos --</option>
+            @foreach (var genero in generos)
+            {
+                <option value="@genero.Valor">@genero.Nombre</option>
+            }
+        </select>
+    </div>
 
-        @foreach (var trabajador in Model)
-        {
+    <table class="table table-bordered" id="tableTrabajadores">
+        <thead>
             <tr>
-                <td>@trabajador.TipoDocumento</td>
-                <td>@trabajador.NumeroDocumento</td>
-                <td>@trabajador.Nombres!.ToUpper()</td>
-                <td>@trabajador.Sexo</td>
-                <td>@trabajador.Departamento</td>
-                <td>@trabajador.Provincia</td>
-                <td>@trabajador.Distrito</td>
-                <td class="d-flex justify-content-between">
-                    <button type="button" data-id="@trabajador.Id" class="btn btn-warning py-0 px-4" data-bs-toggle="modal" data-bs-target="#modalEditTrabajador">
-                         Editar
-                     </button>
-                    <a href="/Trabajador/Delete?id=@trabajador.Id" id="btnEliminar" onclick="return window.confirm('Está seguro de eliminar el registro?')" class="btn btn-danger py-0 px-4">
-                        Eliminar
-                    </a>
-                </td>
+                <th>Tipo Documento</th>
+                <th>Número Documento</th>
+                <th>Nombres</th>
+                <th>Sexo</th>
+                <th>Departamento</th>
+                <th>Provincia</th>
+                <th>Distrito</th>
+                <th class="text-center">Acción</th>
             </tr>
-        }
+        </thead>
+
+        <tbody>
+
+        </tbody>
+
     </table>
 </div>
 
@@ -71,7 +72,37 @@
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
+
+        $(document).ready(function () {
+            cargarTabla();
+
+            $('#comboGenero').on('change', function () {
+                var genero = $(this).val();
+                cargarTabla(genero);
+            });
+        });
+
+       $(document).on('submit', '#formAddTrabajador', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: 'POST',
+                url: form.attr('action') || '@Url.Action("Add", "Trabajador")',
+                data: form.serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        $('#modalAddTrabajador').modal('hide');
+                        location.reload();
+                    } else {
+                        $('#modalAddTrabajador .modal-body').html(response);
+                        $.validator.unobtrusive.parse('#formAddTrabajador');
+                    }
+                }
+            });
+        });
+
         $(document).ready(function() {
             $('#modalAddTrabajador').on('show.bs.modal', function () {
                 var modal = $(this);
@@ -88,5 +119,53 @@
                 modal.find('.modal-body').load('@Url.Action("Edit", "Trabajador")' + '?id=' + id);
             });
         });
+
+        function cargarTabla(genero) {
+            $.ajax({
+                url: '@Url.Action("FilterByGender", "Trabajador")',
+                data: { gender: genero },
+                success: function (data) {
+                    var tbody = $('#tableTrabajadores tbody');
+                    tbody.empty();
+
+                    if (data.length === 0) {
+                        tbody.append('<tr><td colspan="8">No se encontraron trabajadores.</td></tr>');
+                    } else {
+                        $.each(data, function (i, item) {
+                            var fila = '<tr>' +
+                                '<td>' + item.tipoDocumento + '</td>' +
+                                '<td>' + item.numeroDocumento + '</td>' +
+                                '<td>' + item.nombres + '</td>' +
+                                '<td>' + item.sexo + '</td>' +
+                                '<td>' + item.departamento + '</td>' +
+                                '<td>' + item.provincia + '</td>' +
+                                '<td>' + item.distrito + '</td>' +
+                                '<td class="d-flex justify-content-between">' +
+                                    '<button type="button" data-id="' + item.id + '" class="btn btn-warning py-0 px-4" data-bs-toggle="modal" data-bs-target="#modalEditTrabajador">Editar</button>' +
+                                    '<a href="/Trabajador/Delete?id=' + item.id + '" onclick="return window.confirm(\'Está seguro de eliminar el registro?\')" class="btn btn-danger py-0 px-4">Eliminar</a>' +
+                                '</td>' +
+                                '</tr>';
+                            tbody.append(fila);
+                        });
+
+                        colorearFilasSexo('#tableTrabajadores tbody');
+                    }
+                },
+                error: function () {
+                    alert("Error al cargar los trabajadores.");
+                }
+            });
+        }
+
+        function colorearFilasSexo(tbSelector) {
+            $(tbSelector).find('tr').each(function () {
+                var sexo = $(this).find('td').eq(3).text().trim();
+                if (sexo === 'M') {
+                   $(this).css('background-color', '#add8e6');
+                } else {
+                    $(this).css('background-color', '#de9378');
+                }
+            });
+        }
     </script>
 }

@@ -88,14 +88,14 @@ namespace TrabajadoresPrueba.Repositories.Implementation
             }
         }
 
-        public async Task<IEnumerable<TrabajadorVm>> GetList()
+        public async Task<IEnumerable<TrabajadorVm>> GetList(string genero = null)
         {
             IEnumerable<TrabajadorVm> trabajadorList = null;
-            var storeProcedure = "usp_obtener_trabajadores";
+            var storeProcedure = "usp_obtener_trabajadores_filtro";
             try
             {
                 var connection = _factory.GetConnection();
-                trabajadorList = await connection.QueryAsync<TrabajadorVm>(storeProcedure, null, commandType: CommandType.StoredProcedure);
+                trabajadorList = await connection.QueryAsync<TrabajadorVm>(storeProcedure, new { @Sexo = genero}, commandType: CommandType.StoredProcedure);
 
             }
             catch (Exception e)

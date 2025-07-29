@@ -1,4 +1,6 @@
-﻿namespace TrabajadoresPrueba.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TrabajadoresPrueba.Models
 {
     public class TrabajadorModel
     {

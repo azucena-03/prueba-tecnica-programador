@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Threading.Tasks;
 using TrabajadoresPrueba.Models;
-using TrabajadoresPrueba.Repositories;
 using TrabajadoresPrueba.Repositories.Abstract;
-using static Dapper.SqlMapper;
 
 namespace TrabajadoresPrueba.Controllers
 {
@@ -19,10 +16,16 @@ namespace TrabajadoresPrueba.Controllers
             _locationService = locationService;
         }
 
-        public async Task<IActionResult> TrabajadorList()
+        public async Task<IActionResult> TrabajadorList(string gender)
         {
-            var trabajadores = await _trabajadorService.GetList();
+            var trabajadores = await _trabajadorService.GetList(gender);
             return View(trabajadores);
+        }
+
+        public async Task<IActionResult> FilterByGender(string gender)
+        {
+            var productos = await _trabajadorService.GetList(gender);
+            return Ok(productos);
         }
 
         public async Task<IActionResult> Add()
@@ -68,6 +71,7 @@ namespace TrabajadoresPrueba.Controllers
             if (result > 0)
             {
                 TempData["msg"] = "Se agrego el trabajador exitosamente";
+                return Json(new { success = true });
                 return RedirectToAction(nameof(TrabajadorList));
             }
 

@@ -1,6 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
-using System.Data;
-using System.Data.SqlClient;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using TrabajadoresPrueba.Models;
 using TrabajadoresPrueba.Persistence;
 using TrabajadoresPrueba.Repositories.Abstract;
 using TrabajadoresPrueba.Repositories.Implementation;
@@ -11,11 +11,13 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddOptions();
 builder.Services.Configure<ConnectionConfiguration>(builder.Configuration.GetSection("ConnectionStrings"));
-//builder.Services.AddTransient<IDbConnection>(options => new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddTransient<IFactoryConnection, FactoryConnection>();
 builder.Services.AddScoped<ITrabajadorService, TrabajadorService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<TrabajadorModelValidator>();
 
 var app = builder.Build();
 
@@ -35,6 +37,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Trabajador}/{action=TrabajadorList}/{id?}");
 
 app.Run();
